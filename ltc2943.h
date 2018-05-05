@@ -84,8 +84,6 @@ http://www.linear.com/product/LTC2943-1#demoboards
 #ifndef LTC2943_H
 #define LTC2943_H
 
-#include <Wire.h>
-
 
 /*!
 | LTC2943 I2C Address Assignment    | Value |
@@ -219,18 +217,32 @@ http://www.linear.com/product/LTC2943-1#demoboards
 */
 /*! @name Conversion Constants
 @{ */
-const float LTC2943_CHARGE_lsb = 0.34E-3;
-const float LTC2943_VOLTAGE_lsb = 1.44E-3;
-const float LTC2943_CURRENT_lsb = 29.3E-6;
-const float LTC2943_TEMPERATURE_lsb = 0.25;
-const float LTC2943_FULLSCALE_VOLTAGE = 23.6;
-const float LTC2943_FULLSCALE_CURRENT = 60E-3;
-const float LTC2943_FULLSCALE_TEMPERATURE = 510;
+//const float LTC2943_CHARGE_lsb = 0.34E-3;
+//const float LTC2943_VOLTAGE_lsb = 1.44E-3;
+//const float LTC2943_CURRENT_lsb = 29.3E-6;
+//const float LTC2943_TEMPERATURE_lsb = 0.25;
+//const float LTC2943_FULLSCALE_VOLTAGE = 23.6;
+//const float LTC2943_FULLSCALE_CURRENT = 60E-3;
+//const float LTC2943_FULLSCALE_TEMPERATURE = 510;
+//0.34mAh
+#define LTC2943_CHARGE_LSB		34
+//1.44 mV
+#define LTC2943_VOLTAGE_LSB		144
+//29.3 uV
+#define LTC2943_CURRENT_LSB		293
+//0.25 C
+#define LTC2943_TEMPERATURE_LSB			25
+//23.6mV
+#define LTC2943_FULLSCALE_VOLTAGE		236
+//60 mV
+#define LTC2943_FULLSCALE_CURRENT		60
+//510 K
+#define LTC2943_FULLSCALE_TEMPERATURE	510
 //! @}
 
 //! @}
 
-
+#if 0
 //! Write an 8-bit code to the LTC2943.
 //! @return The function returns the state of the acknowledge bit after the I2C address write. 0=acknowledge, 1=no acknowledge.
 int8_t LTC2943_write(uint8_t i2c_address, //!< Register address for the LTC2943
@@ -260,40 +272,40 @@ int8_t LTC2943_read_16_bits(uint8_t i2c_address, //!< Register address for the L
                             uint16_t *adc_code   //!< Value that will be read from the register.
                            );
 
-
+#endif
 //! Calculate the LTC2943 charge in Coulombs
 //! @return Returns the Coulombs of charge in the ACR register.
-float LTC2943_code_to_coulombs(uint16_t adc_code,        //!< The RAW ADC value
-                               float resistor,         //!< The sense resistor value
-                               uint16_t prescalar      //!< The prescalar value
+int LTC2943_code_to_coulombs(u16 adc_code,        //!< The RAW ADC value
+                               u16 resistor,         //!< The sense resistor value
+                               u16 prescalar      //!< The prescalar value
                               );
 
 //! Calculate the LTC2943 charge in mAh
 //! @return Returns the Coulombs of charge in the ACR register.
-float LTC2943_code_to_mAh(uint16_t adc_code,            //!< The RAW ADC value
-                          float resistor,       //!< The sense resistor value
-                          uint16_t prescalar    //!< The prescalar value
+int LTC2943_code_to_mAh(u16 adc_code,            //!< The RAW ADC value
+                          u16 resistor,       //!< The sense resistor value
+                          u16 prescalar    //!< The prescalar value
                          );
 
 //! Calculate the LTC2943 SENSE+ voltage
 //! @return Returns the SENSE+ Voltage in Volts
-float LTC2943_code_to_voltage(uint16_t adc_code              //!< The RAW ADC value
+int LTC2943_code_to_voltage(u16 adc_code              //!< The RAW ADC value
                              );
 
 //! Calculate the LTC2943 current with a sense resistor
 //! @return Returns the current through the sense resisor
-float LTC2943_code_to_current(uint16_t adc_code,                //!< The RAW ADC value
-                              float resistor                   //!< The sense resistor value
+int LTC2943_code_to_current(u16 adc_code,                //!< The RAW ADC value
+                              u16 resistor                   //!< The sense resistor value
                              );
 
 //! Calculate the LTC2943 temperature
 //! @return Returns the temperature in Kelvin
-float LTC2943_code_to_kelvin_temperature(uint16_t adc_code           //!< The RAW ADC value
+int LTC2943_code_to_kelvin_temperature(u16 adc_code           //!< The RAW ADC value
                                         );
 
 //! Calculate the LTC2943 temperature
 //! @return Returns the temperature in Celcius
-float LTC2943_code_to_celcius_temperature(uint16_t adc_code          //!< The RAW ADC value
+int LTC2943_code_to_celcius_temperature(u16 adc_code          //!< The RAW ADC value
                                          );
 
 #endif  // LTC2943_H

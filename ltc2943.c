@@ -69,14 +69,13 @@ ongoing work.
 */
 
 
-#include <Arduino.h>
-#include <stdint.h>
-#include "Linduino.h"
-#include "LT_I2C.h"
-#include "LTC2943.h"
-#include <Wire.h>
+
+#include <linux/types.h>
+
+#include "ltc2943.h"
 
 // Write an 8-bit code to the LTC2943.
+#if 0
 int8_t LTC2943_write(uint8_t i2c_address, uint8_t adc_command, uint8_t code)
 // The function returns the state of the acknowledge bit after the I2C address write. 0=acknowledge, 1=no acknowledge.
 {
@@ -118,57 +117,136 @@ int8_t LTC2943_read_16_bits(uint8_t i2c_address, uint8_t adc_command, uint16_t *
 
   return(ack);
 }
-
-
-float LTC2943_code_to_coulombs(uint16_t adc_code, float resistor, uint16_t prescalar)
+#endif
+/******************************************************************************
+*    Function: LTC2943_code_to_coulombs
+*    Descriptions: convert charge code to coulombs
+*    Paramters:
+            	adc_code               - the adc value 
+		resistor			- the value of register(uint 0.001R)
+		prescalar			- the value of prescaler
+*    Return:
+            > 0                     	- the value of coulombs(uint 0.000001coulombs)
+            < 0                     	- failed
+*    Comments: 
+******************************************************************************/
+int LTC2943_code_to_coulombs(u16 adc_code, u16 resistor, u16 prescalar)
 // The function converts the 16-bit RAW adc_code to Coulombs
 {
-  float coulomb_charge;
-  coulomb_charge =  1000*(float)(adc_code*LTC2943_CHARGE_lsb*prescalar*50E-3)/(resistor*4096);
-  coulomb_charge = coulomb_charge*3.6f;
-  return(coulomb_charge);
+  int coulomb_charge;
+  
+  //coulomb_charge =  1000*(float)(adc_code*LTC2943_CHARGE_lsb*prescalar*50E-3)/(resistor*4096);
+  coulomb_charge =  1000 * (int)(adc_code * LTC2943_CHARGE_LSB * prescalar * 50)/(resistor*4096);
+  coulomb_charge = coulomb_charge * 36;
+  
+  return coulomb_charge;
 }
 
-float LTC2943_code_to_mAh(uint16_t adc_code, float resistor, uint16_t prescalar )
+/******************************************************************************
+*    Function: LTC2943_code_to_mAh
+*    Descriptions: convert charge code to mAh
+*    Paramters:
+            	adc_code               - the adc value 
+		resistor			- the value of register(uint 0.001R)
+		prescalar			- the value of prescaler
+*    Return:
+            > 0                     	- the value of coulombs(uint 0.00001mAh)
+            < 0                     	- failed
+*    Comments: 
+******************************************************************************/
+
+int LTC2943_code_to_mAh(u16 adc_code, u16 resistor, u16 prescalar)
 // The function converts the 16-bit RAW adc_code to mAh
 {
-  float mAh_charge;
-  mAh_charge = 1000*(float)(adc_code*LTC2943_CHARGE_lsb*prescalar*50E-3)/(resistor*4096);
-  return(mAh_charge);
+  int mAh_charge;
+  
+  mAh_charge = 1000 * (int)(adc_code * LTC2943_CHARGE_LSB * prescalar * 50) / (resistor * 4096);
+  
+  return mAh_charge;
 }
 
-float LTC2943_code_to_voltage(uint16_t adc_code)
+/******************************************************************************
+*    Function: LTC2943_code_to_voltage
+*    Descriptions: convert voltage code to coulombs
+*    Paramters:
+            	adc_code               - the adc value 
+*    Return:
+            > 0                     	- the value of coulombs(uint 0.1mV)
+            < 0                     	- failed
+*    Comments: 
+******************************************************************************/
+int LTC2943_code_to_voltage(u16 adc_code)
 // The function converts the 16-bit RAW adc_code to Volts
 {
-  float voltage;
-  voltage = ((float)adc_code/(65535))*LTC2943_FULLSCALE_VOLTAGE;
+  int voltage;
+  
+  voltage = ((int)adc_code * LTC2943_FULLSCALE_VOLTAGE / (65535)) ;
+  
   return(voltage);
 }
 
-float LTC2943_code_to_current(uint16_t adc_code, float resistor)
+/******************************************************************************
+*    Function: LTC2943_code_to_current
+*    Descriptions: convert charge code to coulombs
+*    Paramters:
+            	adc_code               - the adc value 
+		resistor			- the value of register(uint 0.001R)
+*    Return:
+            > 0                     	- the value of coulombs(uint 0.00001mA)
+            < 0                     	- failed
+*    Comments: 
+******************************************************************************/
+int LTC2943_code_to_current(u16 adc_code, u16 resistor)
 // The function converts the 16-bit RAW adc_code to Amperes
 {
-  float current;
-  current = (((float)adc_code-32767)/(32767))*((float)(LTC2943_FULLSCALE_CURRENT)/resistor);
-  return(current);
+  int current;
+  
+  current = (((int)adc_code - 32767) * LTC2943_FULLSCALE_CURRENT / (32767) / resistor);
+  
+  return current;
 }
 
-float LTC2943_code_to_kelvin_temperature(uint16_t adc_code)
+/******************************************************************************
+*    Function: LTC2943_code_to_kelvin_temperature
+*    Descriptions: convert tempurate code to coulombs
+*    Paramters:
+            	adc_code               - the adc value 
+*    Return:
+            > 0                     	- the value of coulombs(uint 1K)
+            < 0                     	- failed
+*    Comments: 
+******************************************************************************/
+int LTC2943_code_to_kelvin_temperature(uint16_t adc_code)
 // The function converts the 16-bit RAW adc_code to Kelvin
 {
-  float temperature;
-  temperature = adc_code*((float)(LTC2943_FULLSCALE_TEMPERATURE)/65535);
-  return(temperature);
+  int temperature;
+  
+  temperature = (int) adc_code *  LTC2943_FULLSCALE_TEMPERATURE / 65535 ;
+  
+  return temperature;
 }
 
-float LTC2943_code_to_celcius_temperature(uint16_t adc_code)
+/******************************************************************************
+*    Function: LTC2943_code_to_celcius_temperature
+*    Descriptions: convert tempurate code to celcius
+*    Paramters:
+            	adc_code               - the adc value 
+*    Return:
+            > 0                     	- the value of coulombs(uint 1C)
+            < 0                     	- failed
+*    Comments: 
+******************************************************************************/
+int LTC2943_code_to_celcius_temperature(u16 adc_code)
 // The function converts the 16-bit RAW adc_code to Celcius
 {
-  float temperature;
-  temperature = adc_code*((float)(LTC2943_FULLSCALE_TEMPERATURE)/65535) - 273.15;
+  int temperature;
+  
+  temperature = (int) adc_code * LTC2943_FULLSCALE_TEMPERATURE / 65535  - 273;
+  
   return(temperature);
 }
 
+#if 0
 // Used to set and clear bits in a control register.  bits_to_set will be bitwise OR'd with the register.
 // bits_to_clear will be inverted and bitwise AND'd with the register so that every location with a 1 will result in a 0 in the register.
 int8_t LTC2943_register_set_clear_bits(uint8_t i2c_address, uint8_t register_address, uint8_t bits_to_set, uint8_t bits_to_clear)
@@ -182,6 +260,6 @@ int8_t LTC2943_register_set_clear_bits(uint8_t i2c_address, uint8_t register_add
   ack |= LTC2943_write(i2c_address, register_address, register_data);
   return(ack);
 }
-
+#endif
 
 

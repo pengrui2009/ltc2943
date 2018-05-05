@@ -99,7 +99,7 @@ struct ltc2943_dev {
 	//resistor is 50 m from datasheet
 	u16 resistor;
 
-	u18 adc_mode;
+	u16 adc_mode;
 	u16 alcc_mode;
 	u16 prescalar;
 	u16 poll_interval;
@@ -108,7 +108,7 @@ struct ltc2943_dev {
 	struct ltc2943_sensor_data sensors[LTC2943_SENSOR_END];
 };
 
-static inline s64 hts221_get_time_ns(void)
+static inline s64 ltc2943_get_time_ns(void)
 {
 	struct timespec ts;
 
@@ -121,9 +121,9 @@ static inline s64 hts221_get_time_ns(void)
 	return timespec_to_ns(&ts);
 }
 
-int hts221_probe(struct hts221_dev *dev);
-void hts221_remove(struct hts221_dev *dev);
-int hts221_enable(struct hts221_dev *dev);
-int hts221_disable(struct hts221_dev *dev);
+int ltc2943_probe(struct ltc2943_dev *dev);
+void ltc2943_remove(struct ltc2943_dev *dev);
+int ltc2943_enable(struct ltc2943_dev *dev);
+int ltc2943_disable(struct ltc2943_dev *dev);
 
 #endif /* _HTC2943_CORE_H_ */
