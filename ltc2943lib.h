@@ -14,7 +14,7 @@
   0	---	sleep mode,sleep
   1	---	manual mode,performing signal conversions voltage,current,and temp  then sleep
   2	---	scan mode,performing voltage,current,and temp conversions every 10s
-  4	---	automatic mode, continuously performing voltage,current,and temp conversions
+  3	---	automatic mode, continuously performing voltage,current,and temp conversions
   default:0
   */
 #define SET_ADC_MODE		    		_IO(HTS_IOC_MAGIC,  0)

@@ -1032,10 +1032,23 @@ static long drv_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 			case 2:
 				mode = ADC_MODE_SCAN;
 				ret = ltc2943_set_adc_mode(ltc2943_ptr, mode);
+                                if(ret < 0)
+                                {
+                                    goto error;
+                                }
+                                //10 second conversion once
+                                ltc2943_ptr->poll_interval = 10000;
 				break;
 			case 3:
 				mode = ADC_MODE_AUTOMATIC;
 				ret = ltc2943_set_adc_mode(ltc2943_ptr, mode);
+                                if(ret < 0)
+                                {
+                                    goto error;
+                                }
+                                //10 second conversion once
+                                //11 second conversion once
+                                ltc2943_ptr->poll_interval = 1000;
 				break;
 			default:
 				ret = -EINVAL;
@@ -1151,7 +1164,8 @@ static long drv_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 		default:
 			break;
 	}
-	
+
+error:	
 	return ret;
 }
 
